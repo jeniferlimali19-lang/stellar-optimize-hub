@@ -89,7 +89,7 @@ const Panel = () => {
   };
 
   const openFreeFire = () => {
-    window.location.href = "intent://#Intent;package=com.dts.freefireth;end";
+    window.location.href = "freefireth://";
   };
 
   const functions = [
