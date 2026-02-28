@@ -1,15 +1,35 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import GalaxyCanvas from "@/components/GalaxyCanvas";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const Login = () => {
   const [password, setPassword] = useState("");
+  const [isAdm, setIsAdm] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === "123") {
+
+    if (isAdm) {
+      if (password === "825419") {
+        navigate("/admin");
+      } else {
+        toast.error("Senha ADM incorreta!");
+      }
+      return;
+    }
+
+    // Verificar senha no banco de dados
+    const { data } = await supabase
+      .from("access_keys")
+      .select("id")
+      .eq("password", password)
+      .eq("active", true)
+      .limit(1);
+
+    if (data && data.length > 0) {
       navigate("/panel");
     } else {
       toast.error("Senha incorreta!");
@@ -30,7 +50,6 @@ const Login = () => {
               <path d="M40 16L44 28H56L46 36L50 48L40 40L30 48L34 36L24 28H36L40 16Z" fill="hsl(330, 90%, 56%)" opacity="0.9" />
               <circle cx="40" cy="40" r="6" fill="hsl(320, 80%, 50%)" />
               <circle cx="40" cy="40" r="3" fill="hsl(330, 100%, 80%)" />
-              {/* Orbiting dots */}
               <circle cx="40" cy="12" r="2.5" fill="hsl(330, 90%, 56%)">
                 <animateTransform attributeName="transform" type="rotate" from="0 40 40" to="360 40 40" dur="8s" repeatCount="indefinite" />
               </circle>
@@ -47,27 +66,32 @@ const Login = () => {
             PAINEL PRO
           </h1>
           <p className="text-center text-muted-foreground text-sm mb-6">
-            Digite a senha para acessar
+            {isAdm ? "Acesso Administrador" : "Digite a senha para acessar"}
           </p>
 
           <form onSubmit={handleLogin} className="space-y-5">
-            <div>
-              <input
-                type="password"
-                placeholder="Senha"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-secondary/80 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/60 focus:border-primary transition-all text-center tracking-widest"
-              />
-            </div>
+            <input
+              type="password"
+              placeholder={isAdm ? "Senha ADM" : "Senha"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-3 rounded-lg bg-secondary/80 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/60 focus:border-primary transition-all text-center tracking-widest"
+            />
             <button
               type="submit"
               className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-semibold tracking-wider hover:brightness-110 transition-all glow-pink-sm active:scale-[0.98]"
               style={{ fontFamily: "'Orbitron', sans-serif" }}
             >
-              ENTRAR
+              {isAdm ? "ENTRAR ADM" : "ENTRAR"}
             </button>
           </form>
+
+          <button
+            onClick={() => { setIsAdm(!isAdm); setPassword(""); }}
+            className="w-full mt-4 text-xs text-muted-foreground hover:text-primary transition-colors text-center"
+          >
+            {isAdm ? "← Voltar ao login normal" : "Login ADM"}
+          </button>
         </div>
       </div>
     </div>
