@@ -17,7 +17,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
+      <BrowserRouter basename="/stellar-optimize-hub">
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/panel" element={<Panel />} />
