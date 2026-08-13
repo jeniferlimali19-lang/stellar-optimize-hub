@@ -80,7 +80,11 @@ const Panel = () => {
   useEffect(() => {
     optimizer.start();
     setToggles(optimizer.getState());
-    return optimizer.subscribe(setToggles);
+    const unsub = optimizer.subscribe(setToggles);
+    return () => {
+      unsub();
+    };
+
   }, []);
 
   const handleToggle = (key: FeatureKey) => {
