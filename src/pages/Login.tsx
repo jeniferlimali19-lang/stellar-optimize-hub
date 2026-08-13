@@ -8,12 +8,28 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [isAdm, setIsAdm] = useState(false);
   const [installPrompt, setInstallPrompt] = useState<any>(null);
+  const [isInstalled, setIsInstalled] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
+    const checkIfInstalled = () => {
+      const standalone =
+        window.matchMedia("(display-mode: standalone)").matches ||
+        (window.navigator as any).standalone === true;
+
+      setIsInstalled(standalone);
+    };
+
+    checkIfInstalled();
+
     const handleBeforeInstallPrompt = (event: Event) => {
       event.preventDefault();
       setInstallPrompt(event);
+    };
+
+    const handleAppInstalled = () => {
+      setIsInstalled(true);
+      setInstallPrompt(null);
     };
 
     window.addEventListener(
@@ -21,11 +37,15 @@ const Login = () => {
       handleBeforeInstallPrompt
     );
 
+    window.addEventListener("appinstalled", handleAppInstalled);
+
     return () => {
       window.removeEventListener(
         "beforeinstallprompt",
         handleBeforeInstallPrompt
       );
+
+      window.removeEventListener("appinstalled", handleAppInstalled);
     };
   }, []);
 
@@ -38,7 +58,13 @@ const Login = () => {
     }
 
     installPrompt.prompt();
-    await installPrompt.userChoice;
+
+    const { outcome } = await installPrompt.userChoice;
+
+    if (outcome === "accepted") {
+      setIsInstalled(true);
+    }
+
     setInstallPrompt(null);
   };
 
@@ -54,7 +80,6 @@ const Login = () => {
       return;
     }
 
-    // Verificar senha no banco de dados
     const { data } = await supabase
       .from("access_keys")
       .select("id")
@@ -76,7 +101,6 @@ const Login = () => {
       <div className="relative z-10 w-full max-w-sm mx-4">
         <div className="glass rounded-2xl p-8 glow-pink">
 
-          {/* Logo */}
           <div className="flex justify-center mb-8">
             <svg
               width="80"
@@ -206,12 +230,14 @@ const Login = () => {
             {isAdm ? "← Voltar ao login normal" : "Login ADM"}
           </button>
 
-          <button
-            onClick={handleInstall}
-            className="w-full mt-5 py-3 rounded-lg border border-primary/50 text-primary font-semibold tracking-wider hover:bg-primary/10 transition-all active:scale-[0.98]"
-          >
-            📱 Fazer download
-          </button>
+          {!isInstalled && (
+            <button
+              onClick={handleInstall}
+              className="w-full mt-5 py-3 rounded-lg border border-primary/50 text-primary font-semibold tracking-wider hover:bg-primary/10 transition-all active:scale-[0.98]"
+            >
+              📱 Fazer download
+            </button>
+          )}
 
         </div>
       </div>
