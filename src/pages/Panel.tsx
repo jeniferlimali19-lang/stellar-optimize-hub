@@ -1,7 +1,8 @@
-import { useState, useRef } from "react";
+import { useState, useEffect } from "react";
 import GalaxyCanvas from "@/components/GalaxyCanvas";
 import { toast } from "sonner";
-import { AimEngine } from "@/lib/engine";
+import { optimizer, type FeatureKey } from "@/lib/optimizer";
+
 
 const FunctionsIcon = () => (
   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
