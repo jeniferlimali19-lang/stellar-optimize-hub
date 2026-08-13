@@ -1,0 +1,135 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.2",
+  "path": "/functions/v1/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://idjeoiovqvomxvuxnwem.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "galaxy-control-panel",
+      "version": "0.1.0",
+      "title": "Galaxy Control Panel"
+    },
+    "tools": [
+      {
+        "name": "list_access_keys",
+        "title": "List access keys",
+        "description": "List the panel access keys (id, label, active status, creation date).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "description": "Max number of keys to return (default 50)."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "create_access_key",
+        "title": "Create access key",
+        "description": "Create a new panel access key with a password and optional label.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "password": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Password used to log into the panel."
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Optional label to identify the key owner."
+            }
+          },
+          "required": [
+            "password"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "set_access_key_active",
+        "title": "Activate or deactivate access key",
+        "description": "Enable or disable an existing panel access key by id.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Access key id."
+            },
+            "active": {
+              "type": "boolean",
+              "description": "True to activate the key, false to deactivate it."
+            }
+          },
+          "required": [
+            "id",
+            "active"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "delete_access_key",
+        "title": "Delete access key",
+        "description": "Permanently delete a panel access key by id.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Access key id to delete."
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
