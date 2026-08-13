@@ -20,8 +20,11 @@ const GalaxyCanvas = () => {
 
     let animationId: number;
     const particles: Particle[] = [];
-    const PARTICLE_COUNT = 90;
-    const CONNECTION_DISTANCE = 140;
+    // Modo leve: menos partículas quando há funções ativas.
+    const lightMode = document.documentElement.classList.contains("light-mode-perf");
+    const PARTICLE_COUNT = lightMode ? 32 : 90;
+    const CONNECTION_DISTANCE = lightMode ? 100 : 140;
+
 
     const resize = () => {
       canvas.width = window.innerWidth;
