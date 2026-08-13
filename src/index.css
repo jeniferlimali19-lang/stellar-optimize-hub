@@ -79,3 +79,22 @@
     @apply bg-card/60 backdrop-blur-xl border border-border/50;
   }
 }
+
+/* Modo leve: ativado enquanto houver funções ligadas — reduz efeitos
+   pesados (blur, glows animados) para liberar GPU/CPU do aparelho. */
+.light-mode-perf .glass {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background-color: hsl(var(--card) / 0.92) !important;
+}
+.light-mode-perf .animate-pulse-glow,
+.light-mode-perf .animate-pulse {
+  animation: none !important;
+}
+.light-mode-perf .glow-pink,
+.light-mode-perf .glow-pink-sm,
+.light-mode-perf .text-glow {
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+

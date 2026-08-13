@@ -1,7 +1,8 @@
-import { useState, useRef } from "react";
+import { useState, useEffect } from "react";
 import GalaxyCanvas from "@/components/GalaxyCanvas";
 import { toast } from "sonner";
-import { AimEngine } from "@/lib/engine";
+import { optimizer, type FeatureKey } from "@/lib/optimizer";
+
 
 const FunctionsIcon = () => (
   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -74,34 +75,25 @@ const TouchIcon = () => (
 
 const Panel = () => {
   const [activeTab, setActiveTab] = useState<"functions" | "info">("functions");
-  const [toggles, setToggles] = useState({
-    recoil: false,
-    inputLag: false,
-    touch: false,
-  });
+  const [toggles, setToggles] = useState(() => optimizer.getState());
 
-  const aimEngineRef = useRef<AimEngine | null>(null);
+  useEffect(() => {
+    optimizer.start();
+    setToggles(optimizer.getState());
+    const unsub = optimizer.subscribe(setToggles);
+    return () => {
+      unsub();
+    };
 
-  const handleToggle = (key: keyof typeof toggles) => {
-    setToggles((prev) => {
-      const next = { ...prev, [key]: !prev[key] };
-      const labels = { recoil: "Reduzir Recuo", inputLag: "Retirar Input Lag", touch: "Otimizar Touch" };
-      toast.success(`${labels[key]} ${next[key] ? "ativado" : "desativado"}!`);
+  }, []);
 
-      if (key === "recoil") {
-        if (next.recoil) {
-          aimEngineRef.current = new AimEngine({ sensitivity: 1.0, clampThreshold: 50 });
-          console.log("[AimEngine] Iniciado — Redução de recuo ativa");
-        } else {
-          aimEngineRef.current?.reset();
-          aimEngineRef.current = null;
-          console.log("[AimEngine] Desligado");
-        }
-      }
-
-      return next;
-    });
+  const handleToggle = (key: FeatureKey) => {
+    const next = !optimizer.getState()[key];
+    optimizer.set(key, next);
+    const labels = { recoil: "Reduzir Recuo", inputLag: "Retirar Input Lag", touch: "Otimizar Touch" };
+    toast.success(`${labels[key]} ${next ? "ativado — rodando em segundo plano" : "desativado"}!`);
   };
+
 
   const openFreeFire = () => {
     window.location.href = "freefireth://";
